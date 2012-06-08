@@ -176,3 +176,30 @@ class TablePivotOperationTest < Test::Unit::TestCase
     end
   end
 end
+
+
+class TablePivotOperationMeanTest < Test::Unit::TestCase
+  
+  def test_mean_group_by_handles_nil
+    table= Table("group", "number", "status")
+    [
+      ["one", 10, "status_one"],
+      ["two", 10, "status_two"]
+    ].each {|e| table << e}
+
+    
+    pivoted=table.pivot("status", :group_by=>"group", :values=>"number", :operation=>:mean)
+    
+    expected = Table('group','status_one','status_two') { |t| t << ['one',10,nil] << ['two',nil,10] }
+    
+    #order is the same
+    assert_equal(expected.column_names, pivoted.column_names)
+    
+    #everything is the same
+    assert_equal(expected,pivoted)
+  end
+
+
+end
+
+
